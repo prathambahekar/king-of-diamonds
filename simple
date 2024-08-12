@@ -1,0 +1,141 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+#include <time.h>
+#include <math.h>
+
+typedef struct {
+    char name[20];
+    int points;
+    int guess;
+    bool is_ai;
+    bool alive;
+} Player;
+
+typedef struct {
+    Player players[5];
+    int num_ai;
+    double sum;
+    double twist_num;
+    int player_alive_num;
+    int round_num;
+    int duplicate_guesses[5];
+    bool new_rule_introduced;
+} Game;
+
+void initialize_player(Player *player, const char *name, bool is_ai) {
+    strcpy(player->name, name);
+    player->points = 0;
+    player->guess = 0;
+    player->is_ai = is_ai;
+    player->alive = true;
+}
+
+void initialize_game(Game *game, int num_ai) {
+    initialize_player(&game->players[0], "pam", false);
+    const char *ai_names[] = {"ash", "adi", "san", "becky"};
+    for (int i = 1; i <= num_ai; i++) {
+        initialize_player(&game->players[i], ai_names[i - 1], true);
+    }
+    game->num_ai = num_ai;
+    game->sum = 0;
+    game->twist_num = 0;
+    game->player_alive_num = num_ai + 1;
+    game->round_num = 1;
+    game->new_rule_introduced = false;
+}
+
+void about(Game *game) {
+    printf("Player Status:\n");
+    printf("------------------------------------------------------------\n");
+    for (int i = 0; i < game->player_alive_num; i++) {
+        if (game->players[i].alive) {
+            printf(" [Name: %s ; Points: %d ; Guess: %d]\n", game->players[i].name, game->players[i].points, game->players[i].guess);
+        }
+    }
+    printf("------------------------------------------------------------\n");
+}
+
+void get_guesses(Game *game) {
+    printf("\nRound %d\n", game->round_num);
+    int index = 0;
+    memset(game->duplicate_guesses, 0, sizeof(game->duplicate_guesses));
+
+    for (int i = 0; i < game->player_alive_num; i++) {
+        if (game->players[i].alive) {
+            if (game->players[i].is_ai) {
+                game->players[i].guess = rand() % 101;
+            } else {
+                do {
+                    printf("Enter your Guess %s between [0,100]: ", game->players[i].name);
+                    scanf("%d", &game->players[i].guess);
+                } while (game->players[i].guess < 0 || game->players[i].guess > 100);
+            }
+
+            // Check for duplicate guesses
+            for (int j = 0; j < i; j++) {
+                if (game->players[i].guess == game->players[j].guess && game->players[j].alive) {
+                    game->duplicate_guesses[index++] = game->players[i].guess;
+                }
+            }
+        }
+    }
+}
+
+void calculate_twist(Game *game) {
+    game->sum = 0;
+    for (int i = 0; i < game->player_alive_num; i++) {
+        if (game->players[i].alive) {
+            game->sum += game->players[i].guess;
+        }
+    }
+    double avg = game->sum / game->player_alive_num;
+    game->twist_num = avg * 0.8;
+}
+
+void eliminate_players(Game *game) {
+    for (int i = 0; i < game->player_alive_num; i++) {
+        if (game->players[i].points <= -10 && game->players[i].alive) {
+            game->players[i].alive = false;
+            game->players[i].guess = 0;
+            game->player_alive_num--;
+            printf("%s has been eliminated!\n", game->players[i].name);
+        }
+    }
+}
+
+void win_round(Game *game) {
+    char winner[20] = "";
+    double min_diff = INFINITY;
+
+    if (game->player_alive_num == 5) {
+        for (int i = 0; i < game->player_alive_num; i++) {
+            if (game->players[i].alive) {
+                double diff = fabs(game->players[i].guess - game->twist_num);
+                if (diff < min_diff) {
+                    min_diff = diff;
+                    strcpy(winner, game->players[i].name);
+                }
+            }
+        }
+
+        for (int i = 0; i < game->player_alive_num; i++) {
+            if (game->players[i].alive && strcmp(game->players[i].name, winner) != 0) {
+                game->players[i].points -= 1;
+            }
+        }
+    } else if (game->player_alive_num < 5) {
+        for (int i = 0; i < game->player_alive_num; i++) {
+            if (game->players[i].alive) {
+                for (int j = 0; j < sizeof(game->duplicate_guesses) / sizeof(game->duplicate_guesses[0]); j++) {
+                    if (game->players[i].guess == game->duplicate_guesses[j]) {
+                        game->players[i].points -= 1;
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < game->player_alive_num; i++) {
+            if (game->players[i].alive) {
+                double diff = fabs(game->players[i].guess - game
