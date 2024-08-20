@@ -1,25 +1,20 @@
 import random
-from colorama import Fore, Style, Back, init
+from colorama import Fore, Style, init
 import pyfiglet
+import json
+from player import Player
 
 # Initialize colorama for colored output
 init(autoreset=True)
 
-# ASCII art for the title
-title = pyfiglet.figlet_format("King of Diamonds", font="standard")
-
-class Player:
-    def __init__(self, name, is_ai):
-        self.name = name         # Player's name
-        self.points = 0          # Player's points
-        self.guess = 0           # Player's guess for the current round
-        self.is_ai = is_ai       # Boolean indicating whether the player is an AI or a human
-        self.alive = True        # Boolean indicating whether the player is still in the game
-
 class Game:
     def __init__(self, num_ai):
+        # Load settings from the JSON file
+        with open("settings.json") as f:
+            self.settings = json.load(f)
+        
         # Create a list of players, with one human player and the specified number of AI players
-        self.players = [Player("player 1", False)] + [Player(name, True) for name in ["player 2", "player 3", "player 4", "player 5"]][:num_ai]
+        self.players = [Player(self.settings["human_name"], False)] + [Player(name, True) for name in self.settings["ai_names"]][:num_ai]
         self.num_ai = num_ai
         self.sum = 0             # Sum of all player guesses in the current round
         self.twist_num = 0       # The "twist" number for the current round
@@ -88,7 +83,7 @@ class Game:
         winner = None
         min_diff = float('inf')
         
-        if self.player_alive_num == 5: # 5 4 3
+        if self.player_alive_num == 5:  # 5 players remaining
             for player in self.players:
                 if player.alive:
                     diff = abs(player.guess - self.twist_num)
@@ -96,13 +91,12 @@ class Game:
                         min_diff = diff
                         winner = player.name
 
-                
             for player in self.players:
                 if player.alive and player.name != winner:
                     player.points -= 1
            
-        elif self.player_alive_num == 4:  # 4 players remaining
-           None
+        elif self.player_alive_num == 4:  # Placeholder for 4 players remaining
+            None
 
         elif self.player_alive_num == 3:  # 3 players remaining
             # Invalidate duplicate guesses
@@ -129,8 +123,7 @@ class Game:
                     if player.alive and player.name != winner:
                         player.points -= 1
 
-        else: #self.player_alive_num == 2
-            # Only two players are left
+        else:  # Only 2 players remaining
             player1, player2 = [player for player in self.players if player.alive]
             if player1.guess == 0 and player2.guess == 100:
                 winner = player2.name
@@ -154,6 +147,7 @@ class Game:
 
     def play(self):
         # Print the game title and welcome message
+        title = pyfiglet.figlet_format("King of Diamonds", font="standard")
         print(Fore.YELLOW + title)
         print(Fore.CYAN + "Welcome to the King of Diamonds")
         print(Fore.YELLOW + "=" * 60)
@@ -180,9 +174,5 @@ class Game:
         # Print the name of the grand winner
         for player in self.players:
             if player.alive:
-                print(Fore.GREEN + Style.BRIGHT + Back.BLACK + f"\n{player.name.upper()} is the grand winner!" + Style.RESET_ALL)
+                print(Fore.GREEN + Style.BRIGHT + f"\n{player.name.upper()} is the grand winner!")
 
-if __name__ == "__main__":
-    # Create a new game with 4 AI players
-    game = Game(num_ai=4)
-    game.play()
