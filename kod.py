@@ -1,5 +1,12 @@
 import random
-import time
+from colorama import Fore, Style, Back, init
+import pyfiglet
+
+# Initialize colorama for colored output
+init(autoreset=True)
+
+# ASCII art for the title
+title = pyfiglet.figlet_format("King of Diamonds", font="standard")
 
 class Player:
     def __init__(self, name, is_ai):
@@ -19,21 +26,20 @@ class Game:
         self.player_alive_num = len(self.players)  # Number of players still in the game
         self.round_num = 1       # Current round number
         self.duplicate_guesses = []  # List to store duplicate guesses
-        self.new_rule_introduced = False  # Flag to track if a new rule was introduced in the current round
 
     def about(self):
         # Print the current status of all players
-        print("Player Status:")
-        print("-" * 60)
+        print(Fore.CYAN + Style.BRIGHT + "Player Status:")
+        print(Fore.YELLOW + "-" * 60)
         for player in self.players:
             if player.alive:
-                print(f' [Name: {player.name} ; Points: {player.points} ; Guess: {player.guess}] ')
-        print("-" * 60)
+                print(Fore.GREEN + f' [Name: {player.name} ; Points: {player.points} ; Guess: {player.guess}] ')
+        print(Fore.YELLOW + "-" * 60)
 
     def guess(self):
         # Get guesses from all alive players for the current round
         print("")
-        print(f"Round {self.round_num}")
+        print(Fore.CYAN + Style.BRIGHT + f"Round {self.round_num}")
         self.duplicate_guesses = []  # Reset the list of duplicate guesses
         for player in self.players:
             if player.alive:
@@ -44,14 +50,14 @@ class Game:
                     # Human player inputs their guess
                     while True:
                         try:
-                            guess = int(input(f"Enter your Guess {player.name} between [0,100]: "))
+                            guess = int(input(Fore.BLUE + f"Enter your Guess {player.name} between [0,100]: "))
                             if 0 <= guess <= 100:
                                 player.guess = guess
                                 break
                             else:
-                                print("Please enter a number between 0 and 100.")
+                                print(Fore.RED + "Please enter a number between 0 and 100.")
                         except ValueError:
-                            print("Invalid input! Please enter a number.")
+                            print(Fore.RED + "Invalid input! Please enter a number.")
             
             # Check for duplicate guesses
             if self.player_alive_num >= 4:
@@ -71,8 +77,7 @@ class Game:
                 player.alive = False
                 player.guess = 0
                 self.player_alive_num -= 1
-                print(f"{player.name} has been eliminated!")
-                self.introduce_new_rule()
+                print(Fore.RED + f"{player.name} has been eliminated!")
 
     def rounds(self):
         # Increment the round number
@@ -83,7 +88,7 @@ class Game:
         winner = None
         min_diff = float('inf')
         
-        if self.player_alive_num == 5:  # 5 players remaining
+        if self.player_alive_num == 5: # 5 4 3
             for player in self.players:
                 if player.alive:
                     diff = abs(player.guess - self.twist_num)
@@ -91,11 +96,15 @@ class Game:
                         min_diff = diff
                         winner = player.name
 
+                
             for player in self.players:
                 if player.alive and player.name != winner:
                     player.points -= 1
-        
-        elif self.player_alive_num < 5:  # 4 or 3 players remaining
+           
+        elif self.player_alive_num == 4:  # 4 players remaining
+           None
+
+        elif self.player_alive_num == 3:  # 3 players remaining
             # Invalidate duplicate guesses
             for duplicate_guess in set(self.duplicate_guesses):
                 for player in self.players:
@@ -111,8 +120,7 @@ class Game:
                         winner = player.name
 
             # Double the penalty for other players if the winner guessed the exact twist_num
-            # (only for 3 players remaining)
-            if self.player_alive_num == 3 and min_diff == 0:
+            if min_diff == 0:
                 for player in self.players:
                     if player.alive and player.name != winner:
                         player.points -= 2
@@ -121,7 +129,8 @@ class Game:
                     if player.alive and player.name != winner:
                         player.points -= 1
 
-        else:  # 2 players remaining
+        else: #self.player_alive_num == 2
+            # Only two players are left
             player1, player2 = [player for player in self.players if player.alive]
             if player1.guess == 0 and player2.guess == 100:
                 winner = player2.name
@@ -134,33 +143,20 @@ class Game:
                             min_diff = abs(player.guess - self.twist_num)
                             winner = player.name
 
+            # Update points for all alive players
             for player in self.players:
                 if player.alive and player.name != winner:
                     player.points -= 1
 
         # Print the winner's name and the "twist" number
         if winner:
-            print(f"\n{winner} has won the round with the closest guess to {self.twist_num:.2f}!")
-            
-    def introduce_new_rule(self):
-        # Introduce a new rule if a player has been eliminated
-        if self.player_alive_num == 4:
-            print("\nNew Rule: If there are 2 people or more who choose the same number, that number becomes invalid, meaning they will lose a point even if the number is closest to 4/5ths the average.")
-            self.new_rule_introduced = True
-        elif self.player_alive_num == 3:
-            print("\nNew Rule: If there is a person who chooses the exact correct number, the loser penalty is doubled.")
-            self.new_rule_introduced = True
-        elif self.player_alive_num == 2:
-            print("\nNew Rule: If someone chooses 0, the player who chooses 100 is the winner.")
-            self.new_rule_introduced = True
-
-        
+            print(Fore.GREEN + Style.BRIGHT + f"\n{winner} has won the round with the closest guess to {self.twist_num:.2f}!")
 
     def play(self):
         # Print the game title and welcome message
-        # print(title)
-        print("Welcome to the King of Diamonds")
-        print("=" * 60)
+        print(Fore.YELLOW + title)
+        print(Fore.CYAN + "Welcome to the King of Diamonds")
+        print(Fore.YELLOW + "=" * 60)
 
         # Play rounds until only one player is left
         while self.player_alive_num > 1:
@@ -184,7 +180,7 @@ class Game:
         # Print the name of the grand winner
         for player in self.players:
             if player.alive:
-                print(f"\n{player.name.upper()} is the grand winner!")
+                print(Fore.GREEN + Style.BRIGHT + Back.BLACK + f"\n{player.name.upper()} is the grand winner!" + Style.RESET_ALL)
 
 if __name__ == "__main__":
     # Create a new game with 4 AI players
