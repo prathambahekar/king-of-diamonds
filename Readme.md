@@ -43,4 +43,8 @@ You can customize the player names in the [settings.json](http://_vscodecontentr
     "human_name": "player 1",
     "ai_names": ["player 2", "player 3", "player 4", "player 5"]
 }
+```
 
+## Image
+
+![image](https://github.com/user-attachments/assets/97e967b5-c168-4484-a8fa-62bd0e4395c9)
