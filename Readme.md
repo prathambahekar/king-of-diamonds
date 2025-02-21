@@ -2,6 +2,11 @@
 
 King of Diamonds is a guessing game where players, including AI, compete to guess a number closest to a calculated "twist" number. The game continues until only one player remains.
 
+## Source
+```
+https://aliceinborderland.fandom.com/wiki/King_of_Diamonds
+```
+
 ## Game Rules
 
 1. **Players**: The game consists of one human player and a specified number of AI players.
