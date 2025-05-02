@@ -52,3 +52,6 @@ You can customize the player names in the [settings.json](http://_vscodecontentr
 ## Image
 
 ![image](https://github.com/user-attachments/assets/97e967b5-c168-4484-a8fa-62bd0e4395c9)
+
+
+#Hello, Pradnya Chute this side. Will be contributing towards this project!
