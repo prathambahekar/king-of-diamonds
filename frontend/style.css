@@ -14,6 +14,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  animation: fadeIn 1s ease-out;
 }
 
 .outer {
@@ -22,6 +23,7 @@ body {
   padding: 16px;
   background-color: #222;
   border: 3px solid #552200;
+  animation: slideIn 1s ease-out;
 }
 
 .container {
@@ -29,6 +31,7 @@ body {
   grid-template-columns: 20% 60% 20%;
   height: 100%;
   gap: 12px;
+  animation: fadeIn 1.5s ease-in-out;
 }
 
 .sidebar {
@@ -38,12 +41,14 @@ body {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  animation: popIn 0.7s ease-out;
 }
 
 .sidebar h2 {
   color: #ff6f00;
   font-size: 14px;
   margin-bottom: 12px;
+  animation: glowText 2s infinite alternate;
 }
 
 .player {
@@ -55,12 +60,18 @@ body {
   color: #ffffff;
   line-height: 1.6;
   min-height: 100px;
+  transition: transform 0.3s;
+}
+
+.player:hover {
+  transform: scale(1.02);
 }
 
 .player .name {
   font-size: 14px;
   color: #ff4500;
   margin-bottom: 6px;
+  animation: flicker 1.5s infinite alternate;
 }
 
 .sidebar.right ul {
@@ -72,6 +83,12 @@ body {
 
 .sidebar.right li {
   margin-bottom: 10px;
+  transition: transform 0.2s;
+}
+
+.sidebar.right li:hover {
+  transform: scale(1.03);
+  color: #ff4500;
 }
 
 .main-section {
@@ -82,12 +99,14 @@ body {
   flex-direction: column;
   justify-content: space-between;
   text-align: center;
+  animation: fadeIn 2s ease;
 }
 
 .main-section h1 {
   font-size: 20px;
   color: #ff4500;
   margin-bottom: 18px;
+  animation: flicker 1.5s infinite alternate;
 }
 
 .main-section p {
@@ -104,6 +123,7 @@ body {
   font-size: 14px;
   text-align: center;
   width: 100%;
+  animation: slideInUp 1s ease-out;
 }
 
 .tabs {
@@ -121,6 +141,11 @@ body {
   color: #ffffff;
   border: 1px solid #555;
   cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-btn:hover {
+  animation: pulseGlow 1.2s infinite;
 }
 
 .tab-btn.active {
@@ -131,6 +156,7 @@ body {
 .tab-content {
   font-size: 11px;
   line-height: 1.8;
+  animation: fadeIn 0.6s ease-in-out;
 }
 
 .tab-content ul {
@@ -140,6 +166,12 @@ body {
 
 .tab-content li {
   margin-bottom: 8px;
+  transition: all 0.2s;
+}
+
+.tab-content li:hover {
+  color: #ff4500;
+  transform: translateX(5px);
 }
 
 .hidden {
@@ -154,6 +186,8 @@ body {
   max-height: 220px;
   overflow: hidden;
   width: 100%;
+  animation: slideInUp 1s ease;
+  transition: max-height 0.5s ease-in-out;
 }
 
 .number-row {
@@ -176,10 +210,78 @@ body {
   cursor: pointer;
   min-width: 0;
   min-height: 18px;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, transform 0.2s;
 }
 
 .number-btn:hover {
   background-color: #ff4500;
   color: #000;
+  transform: scale(1.05);
+  animation: pulseGlow 1s infinite;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes flicker {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 0px #ff4500;
+  }
+  50% {
+    box-shadow: 0 0 10px #ff4500;
+  }
+  100% {
+    box-shadow: 0 0 0px #ff4500;
+  }
+}
+
+@keyframes glowText {
+  from {
+    text-shadow: 0 0 2px #ff4500, 0 0 10px #ff4500;
+  }
+  to {
+    text-shadow: 0 0 5px #ff4500, 0 0 20px #ff4500;
+  }
 }
